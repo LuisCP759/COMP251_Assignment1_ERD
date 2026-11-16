@@ -1,67 +1,80 @@
-# Assignment 1 - Creating an ER Diagram for MPLSRenters.com
-This assignment will meet each of the objectives below:
-1. Translate business use cases for data into entity relationships
+﻿# MPLSRenters.com — Assignment 1
 
-2. Determine appropriate entity structure for relational databases
+This model stores prospective renter profiles, luxury properties, shared amenities, agent subscriptions, and offers.
 
-3. Apply the correct terminology to a ER Model
+## ER diagram
 
-4. Design an ER model
+![MPLSRenters entity relationship diagram](MPLSRenters_ERD.svg)
 
-## Instructions
-For this assignment, your task is to analyze the provided business description and identify the necessary business rules to create an ER diagram. These rules will encompass relationships, constraints, and data requirements.
+[Editable draw.io XML](<MPLSRenters — Assignment 1.drawio>) — open with VS Code's recommended Draw.io Integration extension or diagrams.net.
 
-You are required to compile a README.md file, which will detail each entity along with a brief description of its purpose and the data it collects. Additionally, identify the relationships between entities and note any assumptions or questions you may have for the client based on the business description. You will also decide the answers to your assumptions on behalf of the client.
+PK = primary key; FK = foreign key; NN = NOT NULL; NULL = optional. Solid lines indicate identifying relationships (the parent key is part of the child PK). Dashed lines indicate non-identifying relationships. Crow's-foot symbols indicate many; circles indicate zero; bars indicate one.
 
-After completing the README.md file, your next step is to construct an ER Diagram based on the identified relationships from the business description. This diagram should be created using a free web-based tool called 'draw.io.' You'll find the shapes needed for your ER diagram under the 'Entity Relation' tab. Instructions on how to operate draw.io can be found in the assignment resources section below. **DRAW.IO must be used as your ER diagram tool**
+## Entities and attributes
 
-## Business Description
-MPLSRenters.com is a website that allows prospective apartment renters to create a profile and have
-high-end luxury apartments make offers to prospective renters.
+| Entity | Purpose and collected data |
+| --- | --- |
+| **RENTER_PROFILE** | A prospective renter. PK: `profile_id`. Attributes: `first_name`, `last_name`, `email`, `phone`, `address`, `short_description`, `long_description`, `latitude`, `longitude`, `decision_date`, `bedrooms`, `bathrooms`, `min_budget`, `max_budget`. Optional FK: `classification_code`. |
+| **PROPERTY** | A rental property. PK: `property_id`. Attributes: `property_name`, `contact_first_name`, `contact_last_name`, `email`, `phone`, `address`, `short_description`, `long_description`, `latitude`, `longitude`, `square_feet`, `min_rent`, `max_rent`. Optional FK: `classification_code`. Unique amenities go in `long_description`. |
+| **CLASSIFICATION** | A preset classification. PK: `classification_code`; attributes: `title`, `description`. Codes: A (high luxury), B (high–mid luxury), C (luxury). |
+| **AMENITY** | A preset amenity shared by properties and renter preferences. PK: `amenity_id`; attributes: `name`, `description`. |
+| **AGENT_PACKAGE** | One of three preset packages determining profile access. PK: `package_id`; attributes: `name`, `description`, `access_level`. |
+| **PROPERTY_AGENT** | A subscribing agent. PK: `agent_id`; required FK: `package_id`. Attributes: `first_name`, `last_name`, `email`, `phone`, `billing_cycle`, `paid_through`, `is_active`. Monthly/yearly selection belongs to each agent's subscription. |
+| **SAVED_PROPERTY** | A property saved to a renter's profile. Composite PK/FKs: (`profile_id`, `property_id`). |
+| **PROFILE_AMENITY** | A renter's desired amenity. Composite PK/FKs: (`profile_id`, `amenity_id`). |
+| **PROPERTY_AMENITY** | An amenity offered by a property. Composite PK/FKs: (`property_id`, `amenity_id`). |
+| **PROPERTY_AGENT_ASSIGNMENT** | An agent's association with a property. Composite PK/FKs: (`property_id`, `agent_id`); attribute: `assigned_on`. |
+| **OFFER** | An offer to a renter for an agent's property. PK: `offer_id`; required FK: `profile_id`; required composite FK: (`property_id`, `agent_id`) referencing **PROPERTY_AGENT_ASSIGNMENT**. Attributes: `offer_description`, `offered_on`, `expires_on`, `status`. Property name comes from **PROPERTY**. |
 
-1.  A property can have many high-end amenities associated with it. The amenities that are
-associated with a property are preset amenities that can be added to a property.  Each amenity will have a name and description. 
- If properties have unique amenities that are not a part of the preset amenities, then those details will go into
-the long description for each property. A property will contain information such as first and last name, email, phone, address, short and long description, longitude/latitude of property, and rent range (the lowest and highest amount you can expect to pay).
-2. Prospective renters can add as many amenities to their profile as they deem necessary. The amenities will
-be the same preset amenities that can be added to a property.  A renter will collect the same information a property would collect, but will also include a renter's decision date, the number of bedrooms and bathrooms, and the lower and max rent value they are willing to spend.  
-3. Prospective renters can add as many properties to their profile as they desire. A prospective renter can exist in the system without having a property associated with a profile.
-4. A property can have multiple property agents associated with a property. A property does not
-have to be associated with a property agent to exist within the database. Property agents can
-be activated and deactivated from the system based on whether or not payment for a monthly
-package was made on time.
-5. Both a profile and a property can receive a classification. There are only three pre-determined
-classifications that can be associated with a profile or property. A profile is classified based on
-the lower and upper range a prospective renter is looking to have for monthly rent. A
-property is classified based on the select amenities, square footage, and lower/upper rent range. Each classification will contain a title, description, and a classification identifier (ex.  A high-luxury, B high - mid-luxury, or C luxury property)
-6. A property agent can sign-up for one of three packages. All property agents must have an agent
-package. An agent package determines how much access they will be granted to user profile
-information.  An Agent package will contain a name, the package description, and an agent option selection (monthly payment package or yearly payment package)
-7. Property agents are able to make multiple offers to those who have profiles in the system. A
-profile can receive multiple offers from an agent. A profile can decline or entertain an offer.  An offer will contain information such as a description of the offer, the offer expiration date, and the property name for which the offer is being made.
+## Relationships
 
-## Submission Guidelines
+Each row states both directions. The four associative entities resolve the many-to-many relationships between profiles/properties, profiles/amenities, properties/amenities, and properties/agents.
 
-For this assignment, you will submit 2 items to the repository that has been assigned to you.  The two items that you will need to submit are listed below: 
-1. The README.MD file that identifies the various Entities and a brief description of the entity and possible attributes, relationships, and assumptions. 
-   1. When identifying relationships be sure to bold and uppercase the entity name, underline the verb and make sure relationships are bi-directional. 
-   2. When identifying assumptions, make sure to answer your assumption with either a Yes or No and make sure your response is properly reflected in the ER diagram.  
-   3. You can override this README.MD file that contains the instructions or extend this README.MD file by listing your requirements below the Assignment Resources section.
+| Forward relationship | Reverse relationship |
+| --- | --- |
+| **CLASSIFICATION** <u>classifies</u> zero or many **RENTER_PROFILE** records. | **RENTER_PROFILE** <u>receives</u> zero or one **CLASSIFICATION**. |
+| **CLASSIFICATION** <u>classifies</u> zero or many **PROPERTY** records. | **PROPERTY** <u>receives</u> zero or one **CLASSIFICATION**. |
+| **AGENT_PACKAGE** <u>serves</u> zero or many **PROPERTY_AGENT** records. | **PROPERTY_AGENT** <u>subscribes to</u> exactly one **AGENT_PACKAGE**. |
+| **RENTER_PROFILE** <u>has</u> zero or many **SAVED_PROPERTY** records. | **SAVED_PROPERTY** <u>belongs to</u> exactly one **RENTER_PROFILE**. |
+| **PROPERTY** <u>appears in</u> zero or many **SAVED_PROPERTY** records. | **SAVED_PROPERTY** <u>identifies</u> exactly one **PROPERTY**. |
+| **RENTER_PROFILE** <u>has</u> zero or many **PROFILE_AMENITY** records. | **PROFILE_AMENITY** <u>belongs to</u> exactly one **RENTER_PROFILE**. |
+| **AMENITY** <u>appears in</u> zero or many **PROFILE_AMENITY** records. | **PROFILE_AMENITY** <u>identifies</u> exactly one **AMENITY**. |
+| **PROPERTY** <u>has</u> zero or many **PROPERTY_AMENITY** records. | **PROPERTY_AMENITY** <u>belongs to</u> exactly one **PROPERTY**. |
+| **AMENITY** <u>appears in</u> zero or many **PROPERTY_AMENITY** records. | **PROPERTY_AMENITY** <u>identifies</u> exactly one **AMENITY**. |
+| **PROPERTY** <u>has</u> zero or many **PROPERTY_AGENT_ASSIGNMENT** records. | **PROPERTY_AGENT_ASSIGNMENT** <u>identifies</u> exactly one **PROPERTY**. |
+| **PROPERTY_AGENT** <u>has</u> zero or many **PROPERTY_AGENT_ASSIGNMENT** records. | **PROPERTY_AGENT_ASSIGNMENT** <u>identifies</u> exactly one **PROPERTY_AGENT**. |
+| **RENTER_PROFILE** <u>receives</u> zero or many **OFFER** records. | **OFFER** <u>targets</u> exactly one **RENTER_PROFILE**. |
+| **PROPERTY_AGENT_ASSIGNMENT** <u>supports</u> zero or many **OFFER** records. | **OFFER** <u>references</u> exactly one **PROPERTY_AGENT_ASSIGNMENT**. |
 
-2. The draw.io XML file that contains your ER Diagram.  You will also need to take a snippet of the ER Diagram and add it as an image in your README file.
+Through assignments, each agent can make many offers and each property can be offered many times. A profile may receive repeated offers from the same agent.
 
-Once you have completed both of the items above, you will need to submit the link to your repository for assignment 1 prior to the due date and time listed.  Make sure you receive an email confirmation notifying you that the assignment has been submitted.
+## Assumptions and client decisions
 
-### Rubric
-| Criteria           | Description                             | Points |
-| -------------------| --------------------------------------- | ------ |
-|**Deliverable 1 - Write-up documented in README.md file**   | Write-up identifies the various entities with brief description (4pts) <br> Write-up identifies the various relationships that exist between the entities (6pt) <br> Write-up list assumptions that provides context for cardinality and entity strength (2 pts) <br> Write-up contains uppercase entity names, underlined verb and relationships are bi-directional (3 pts)  |   15   |
-|**Deliverable 2 - Properly structured ER diagram** | All Entities identified in deliverable 1 are visually represented in Workbench ER diagram. (4pts) <br> Relationship strength is indicated by solid or dotted line (2pt) <br> Foreign keys and Primary keys are identified and correctly assigned (2 pts) <br> Each column name indicates null vs not null (2pt) <br> Image of ER diagram is depicted in README.MD file (2 pt) <br> Associative entities are identified and properly captures the relationship between the two entities(3 pts)   |   15   |
-|           |        |**Total Points:   30**   |
+| Question | Answer | Effect on the model |
+| --- | --- | --- |
+| Can a profile exist without saved properties or desired amenities? | **Yes** | Both associative collections allow zero records. |
+| Can a property exist without agents or preset amenities? | **Yes** | Both associative collections allow zero records. Unique amenities use the property's long description. |
+| Can an agent represent multiple properties and a property have multiple agents? | **Yes** | **PROPERTY_AGENT_ASSIGNMENT** resolves this many-to-many relationship. Agents may initially have no assignments. |
+| Can a property or profile exist before classification? | **Yes** | Both classification FKs allow NULL, with zero-or-one classification cardinality. |
+| Can a property or profile have multiple simultaneous classifications? | **No** | Each stores only one optional classification FK. |
+| Are classifications restricted to the three preset codes A, B, and C? | **Yes** | **CLASSIFICATION** is a controlled lookup. Profiles use budget bounds; properties use amenities, square footage, and rent bounds. Exact thresholds require client-defined rules. |
+| Must each agent subscribe to exactly one of three packages? | **Yes** | `package_id` is a required FK. Package names, prices, and specific access permissions are not supplied; the three catalog entries are client-defined. |
+| Does each agent choose monthly or yearly billing? | **Yes** | `billing_cycle` accepts `MONTHLY` or `YEARLY`, allowing different billing choices for agents on the same package. |
+| Can an overdue agent remain in the database? | **Yes** | `is_active` records activation; `paid_through` records payment coverage. NULL means no confirmed payment. Paid agents are active while coverage remains current; overdue/unpaid agents are inactive. Only active agents may issue new offers. |
+| Must the offering agent represent the offered property? | **Yes** | **OFFER** uses a composite FK to **PROPERTY_AGENT_ASSIGNMENT**. |
+| Can the same agent send a profile multiple offers for the same property? | **Yes** | Offers have independent `offer_id` keys; the profile/agent/property combination is not unique. |
+| Must a renter save a property before receiving an offer? | **No** | Offers do not depend on **SAVED_PROPERTY**. |
+| Can a renter decline or entertain an offer? | **Yes** | `status` accepts `PENDING`, `DECLINED`, or `ENTERTAINED`. New offers start as `PENDING`; expiration is determined using `expires_on`. |
+| Must OFFER duplicate the property name? | **No** | The referenced **PROPERTY** supplies `property_name`. |
+| Can associative records exist without either parent or duplicate a parent pair? | **No** | Both parent FKs form the composite PK and are NOT NULL. These relationships are identifying and solid. |
+| Are offers identified by their parents' keys? | **No** | **OFFER** has its own PK. Its required parent relationships are non-identifying and dashed. |
 
+## Data constraints
 
-## Assignment Resources
-- [Mark-down Syntax Cheat Sheet](https://enterprise.github.com/downloads/en/markdown-cheatsheet.pdf)
-- [Make a ReadMe file Web-based Editor](https://www.makeareadme.com/)
-- [Draw.io Web-based diagramming tool](https://app.diagrams.net/)
-- [Creating Entity Relationship Diagrams using Draw.io](https://www.youtube.com/watch?v=lAtCySGDD48)
+Each attribute's data type and NULL/NN requirement appears in the diagram. Primary keys are NOT NULL. Rent/budget minimums must not exceed maximums; rent, budget, bedrooms, bathrooms, and square footage cannot be negative. Latitude must be between -90 and 90; longitude between -180 and 180. Offer expiration cannot precede the offer date.
+
+The three classifications, three packages, permitted billing cycles, permitted offer statuses, and payment eligibility are business constraints to enforce in a database/application implementation. Foreign keys alone do not enforce payment eligibility or classification thresholds.
+
+## Submission
+
+Commit and push this README, the draw.io XML, and the embedded diagram image. Submit the repository link in the course system before the deadline and check for the required confirmation email.
