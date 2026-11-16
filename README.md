@@ -8,6 +8,8 @@ This model stores prospective renter profiles, luxury properties, shared ameniti
 
 [Editable draw.io XML](<MPLSRenters — Assignment 1.drawio>) — open with VS Code's recommended Draw.io Integration extension or diagrams.net.
 
+[Open the diagram in diagrams.net](https://app.diagrams.net/?utm_source=chatgpt.com#HLuisCP759%2FCOMP251_Assignment1_ERD%2Fmain%2FMPLSRenters%20%E2%80%94%20Assignment%201.drawio#%7B%22pageId%22%3A%22mpls-erd%22%7D)
+
 PK = primary key; FK = foreign key; NN = NOT NULL; NULL = optional. Solid lines indicate identifying relationships (the parent key is part of the child PK). Dashed lines indicate non-identifying relationships. Crow's-foot symbols indicate many; circles indicate zero; bars indicate one.
 
 ## Entities and attributes
